@@ -29,10 +29,10 @@ $vm = read-host -Prompt "Enter name of VM to snapshot"
 
 foreach ($vcenter in $vcenters) {
     if ( $vcenter -eq 'heivcsa.corp.duracell.com' ) {
-        $securePassword = Get-Content '/opt/scripts/vmware/hei.cred' | ConvertTo-SecureString
+        $securePassword = Get-Content '/opt/scripts/.credfiles/hei.cred' | ConvertTo-SecureString
         $credentials = New-Object System.Management.Automation.PSCredential ("administrator@heist.local", $securePassword)
     } else {
-        $securePassword = Get-Content '/opt/scripts/vmware/vctr.cred' | ConvertTo-SecureString
+        $securePassword = Get-Content '/opt/scripts/.credfiles/vctr.cred' | ConvertTo-SecureString
         $credentials = New-Object System.Management.Automation.PSCredential ("administrator@vsphere.local", $securePassword)
     }
     write-host "`nSearching $vcenter"
@@ -106,7 +106,7 @@ if ($keepDays) {
     
     $keepTime = $keepDays * 86400
     $removeTime = $createTime + $keepTime
-    $removeFile = "/opt/scripts/vmware/activesnaps/$vm-$removeTime.csv"
+    $removeFile = "/opt/scripts/activesnaps/$vm-$removeTime.csv"
     new-item $removeFile -ItemType File | Out-Null
     Invoke-Command{chmod 666 $removeFile}
     set-content $removeFile 'vCenter, VM, SnapName, Taken, Remove'
@@ -114,7 +114,7 @@ if ($keepDays) {
 } 
 else { $keepDaysMSG "Snapshot WILL NOT be deleted automatically."}
 
-$filename = "/opt/scripts/vmware/scheduledSnaps/$vm-$createTime.csv"
+$filename = "/opt/scripts/scheduledSnaps/$vm-$createTime.csv"
 new-item $filename -ItemType File | Out-Null
 Invoke-Command{chmod 666 $filename}
 $currentTime = get-date -UFormat %s

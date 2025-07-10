@@ -59,7 +59,7 @@ if ( $foundvc -eq 'heivcsa.corp.duracell.com' ) {
 $datecode = Get-Date -UFormat %s
 $keepTime = $keepDays * 86400
 $removeTime = $datecode + $keepTime
-$filename = "/opt/scripts/vmware/activesnaps/$vm-$removeTime.csv"
+$filename = "/opt/scripts/activesnaps/$vm-$removeTime.csv"
 new-item $filename -ItemType File | Out-Null
 Invoke-Command{chmod 666 $filename}
 set-content $filename 'vCenter, VM, SnapName, Taken, Remove'

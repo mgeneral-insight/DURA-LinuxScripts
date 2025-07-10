@@ -1,11 +1,11 @@
 function Write-Log {
         Param ( $text )
-        "$(get-date -format "yyyy-MM-dd HH:mm:ss"): $($text)" | out-file "/opt/scripts/vmware/RemoveSnaps.log" -Append
+        "$(get-date -format "yyyy-MM-dd HH:mm:ss"): $($text)" | out-file "/opt/scripts/logs/RemoveSnaps.log" -Append
 }
 [System.Net.Http.HttpClient]::DefaultProxy = New-Object System.Net.WebProxy($null)
 
 $currentdate = Get-Date -UFormat %s
-$snapFiles = get-childitem "/opt/scripts/vmware/activesnaps/*"
+$snapFiles = get-childitem "/opt/scripts/activesnaps/*"
 ForEach ($snapFile in $snapFiles) {
     $snap = Import-Csv $snapFile
     $removeDate = $snap.Remove
@@ -16,10 +16,10 @@ ForEach ($snapFile in $snapFiles) {
         $snapname = $snap.SnapName
 
         if ( $vcenter -eq 'heivcsa.corp.duracell.com' ) {
-            $securePassword = Get-Content '/opt/scripts/vmware/hei.cred' | ConvertTo-SecureString
+            $securePassword = Get-Content '/opt/scripts/.credfiles/hei.cred' | ConvertTo-SecureString
             $credentials = New-Object System.Management.Automation.PSCredential ("administrator@heist.local", $securePassword)
         } else {
-            $securePassword = Get-Content '/opt/scripts/vmware/vctr.cred' | ConvertTo-SecureString
+            $securePassword = Get-Content '/opt/scripts/.credfiles/vctr.cred' | ConvertTo-SecureString
             $credentials = New-Object System.Management.Automation.PSCredential ("administrator@vsphere.local", $securePassword)
         }
         $conn = connect-viserver -server $vcenter -credential $credentials

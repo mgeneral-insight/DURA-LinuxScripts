@@ -1,6 +1,6 @@
 [System.Net.Http.HttpClient]::DefaultProxy = New-Object System.Net.WebProxy($null)
 $currentTime = Get-Date -UFormat %s
-$schedules = get-childitem "/opt/scripts/vmware/scheduledSnaps/*"
+$schedules = get-childitem "/opt/scripts/scheduledSnaps/*"
 foreach ($schedule in $schedules) {
     $snap = import-csv $schedule
     $takeTime = $snap.ScheduledTime
@@ -11,10 +11,10 @@ foreach ($schedule in $schedules) {
         $scheduleDate = $snap.ScheduledTime
         $notifyEmail = $snap.NotifyEmail
         if ( $vc -eq 'heivcsa.corp.duracell.com' ) {
-            $securePassword = Get-Content '/opt/scripts/vmware/hei.cred' | ConvertTo-SecureString
+            $securePassword = Get-Content '/opt/scripts/.credfiles/hei.cred' | ConvertTo-SecureString
             $credentials = New-Object System.Management.Automation.PSCredential ("administrator@heist.local", $securePassword)
         } else {
-            $securePassword = Get-Content '/opt/scripts/vmware/vctr.cred' | ConvertTo-SecureString
+            $securePassword = Get-Content '/opt/scripts/.credfiles/vctr.cred' | ConvertTo-SecureString
             $credentials = New-Object System.Management.Automation.PSCredential ("administrator@vsphere.local", $securePassword)
         }
         $conn1 = connect-viserver -server $vc -credential $credentials
