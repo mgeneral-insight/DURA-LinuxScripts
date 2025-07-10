@@ -1,5 +1,5 @@
 param ($vm)
- 
+
 $ErrorActionPreference = "SilentlyContinue"
 [System.Net.Http.HttpClient]::DefaultProxy = New-Object System.Net.WebProxy($null)
 $keepDays = 5
@@ -15,10 +15,10 @@ heivcsa.corp.duracell.com
 function findVM {
     param ($vctr)
     if ( $vctr -eq 'heivcsa.corp.duracell.com' ) {
-        $securePassword = Get-Content '/opt/scripts/vmware/hei.cred' | ConvertTo-SecureString
+        $securePassword = Get-Content '/opt/scripts/.credfiles/hei.cred' | ConvertTo-SecureString
         $credentials = New-Object System.Management.Automation.PSCredential ("administrator@heist.local", $securePassword)
     } else {
-        $securePassword = Get-Content '/opt/scripts/vmware/vctr.cred' | ConvertTo-SecureString
+        $securePassword = Get-Content '/opt/scripts/.credfiles/vctr.cred' | ConvertTo-SecureString
         $credentials = New-Object System.Management.Automation.PSCredential ("administrator@vsphere.local", $securePassword)
     }
     $conn = connect-viserver -server $vctr -credential $credentials
@@ -49,10 +49,10 @@ Write-Host "$vm found on $foundvc"
 Write-Host "Taking snapshot of $vm"
 
 if ( $foundvc -eq 'heivcsa.corp.duracell.com' ) {
-    $securePassword = Get-Content '/opt/scripts/vmware/hei.cred' | ConvertTo-SecureString
+    $securePassword = Get-Content '/opt/scripts/.credfiles/hei.cred' | ConvertTo-SecureString
     $credentials = New-Object System.Management.Automation.PSCredential ("administrator@heist.local", $securePassword)
 } else {
-    $securePassword = Get-Content '/opt/scripts/vmware/vctr.cred' | ConvertTo-SecureString
+    $securePassword = Get-Content '/opt/scripts/.credfiles/vctr.cred' | ConvertTo-SecureString
     $credentials = New-Object System.Management.Automation.PSCredential ("administrator@vsphere.local", $securePassword)
 }
 
