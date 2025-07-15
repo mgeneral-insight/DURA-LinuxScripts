@@ -3,13 +3,7 @@ param ($vm)
 $ErrorActionPreference = "SilentlyContinue"
 [System.Net.Http.HttpClient]::DefaultProxy = New-Object System.Net.WebProxy($null)
 $keepDays = 5
-$vcenters = @'
-aar-winvc04.corp.duracell.com
-becn-wvvctrp03.corp.duracell.com
-cnnc-winvc01.corp.duracell.com
-dgwinvc03.corp.duracell.com
-heivcsa.corp.duracell.com
-'@ -split "`r`n"
+$vcenters = @("aar-winvc04.corp.duracell.com", "becn-wvvctrp03.corp.duracell.com", "cnnc-winvc01.corp.duracell.com", "dgwinvc03.corp.duracell.com", "heivcsa.corp.duracell.com")
 
 
 function findVM {
@@ -24,19 +18,19 @@ function findVM {
     $conn = connect-viserver -server $vctr -credential $credentials
     $getvm = get-vm $vm
     disconnect-viserver * -Confirm:$false
-    if ( $null -eq $getvm ) {
-        write-host "... not found on $vctr"
-    } else {
+    if ($getvm) {
         $script:foundvc = $vctr
         break
     }
 }
+clear-host
+get-content -raw /opt/scripts/linux/logo.txt
+Write-Host "This script will take a snapshot of a specified VM and will automatically delete the snapshot after $keepDays days."
+write-host ""
 
-Write-Host "This program will take a snapshot of a specified VM and will automatically delete the Snapshot after 96 hours."
 if (!($vm)) { $vm = Read-Host "Enter the name of the VM to snapshot" }
-Write-Host "`n `nSearching vCenters for VM $vm..."
+Write-Host "Searching vCenters for VM $vm..."
 foreach ($vcenter in $vcenters) {
-    write-host "`nSearching $vcenter"
     findVM -vctr $vcenter
 }
 if ( $null -eq $foundvc ) {
@@ -56,14 +50,15 @@ if ( $foundvc -eq 'heivcsa.corp.duracell.com' ) {
     $credentials = New-Object System.Management.Automation.PSCredential ("administrator@vsphere.local", $securePassword)
 }
 
-$datecode = Get-Date -UFormat %s
-$keepTime = $keepDays * 86400
-$removeTime = $datecode + $keepTime
-$filename = "/opt/scripts/activesnaps/$vm-$removeTime.csv"
+[int]$currentTime = Get-Date -UFormat %s
+$keepTime = $keepDays * 86400 
+$removeTime = $currentTime + $keepTime
+$filename = "/opt/scripts/.activeSnaps/$vm-$currentTime.csv"
 new-item $filename -ItemType File | Out-Null
 Invoke-Command{chmod 666 $filename}
+$snapname = "Insight-$currentTime"
 set-content $filename 'vCenter, VM, SnapName, Taken, Remove'
-add-content $filename "$foundvc, $vm, Insight-$removeTime, $datecode, $removeTime"
+add-content $filename "$foundvc, $vm, $snapname, $currentTime, $removeTime"
 
 $conn1 = connect-viserver -server $foundvc -credential $credentials
 $createsnap = new-snapshot -vm $vm -name $snapname -confirm:$false
