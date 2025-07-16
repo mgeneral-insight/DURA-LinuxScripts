@@ -74,9 +74,8 @@ function Test-TimeInput {
     return $TimeInput -as [DateTime] -ne $null
 }
 do {
-    $timeString = Read-Host -Prompt "Enter time to take the snapshot (HH:MM or HH:MM AM/PM)"
+    $timeString = Read-Host -Prompt "Enter time to take the snapshot in the timezone you selected above (HH:MM or HH:MM AM/PM)"
 } until (Test-TimeInput -TimeInput $timeString)
-
 
 function Test-Date {
     param (
@@ -85,26 +84,31 @@ function Test-Date {
     return $DateInput -as [DateTime] -ne $null
 }
 do {
-    $dateString = Read-Host -Prompt 'Enter date to take the snapshot (mm/dd/yyyy)'
+    $dateString = Read-Host -Prompt 'Enter date to take the snapshot in the timezone you selected above (mm/dd/yyyy)'
 } until (Test-Date -DateInput $dateString)
 
-
 $inDT = "$dateString $timeString"
-write-host "inDT - $inDT"
+#write-host "inDT - $inDT"
 $inDTnice = [datetime]$inDT
-write-host "inDTnice - $inDTnice"
-write-host "tz - $tz"
+#write-host "inDTnice - $inDTnice"
+#write-host "tz - $tz"
 $outTZ = [System.TimeZoneInfo]::GetSystemTimeZones() | Where-Object { $_.Id -eq "America/New_York" }
 if ($tz -eq "Eastern Standard Time") {
     $outDT = [datetime]$inDT
 } else {
     $inTZ = [System.TimeZoneInfo]::GetSystemTimeZones() | Where-Object { $_.Id -eq $tz }
-    write-host "inTZ - $inTZ"
+    #write-host "inTZ - $inTZ"
     $outDT = [System.TimeZoneInfo]::ConvertTime($inDT, $inTZ, $outTZ)
 }
-write-host "outDT - $outDT"
+#write-host "outDT - $outDT"
 [int]$createTime = [long](Get-Date -Date $outDT -UFormat %s)
-write-host "createTime - $createTime"
+#write-host "createTime - $createTime"
+$currentTime = get-date -UFormat %s
+
+if ($currentTime -gt $createTime) {
+    write-host "ERROR: Scheduled time is in the past" -foregroundcolor red
+    exit 1
+}
 
 $notifyEmail = read-host -prompt "Enter email addresses to notify once snapshot has been taken (sepearate multiple addresses with semicolon ;) Press ENTER to skip"
 while ($notifyEmail.contains(",")) { $notifyEmail = read-host -prompt "Enter email addresses to notify once snapshot has been taken (sepearate multiple addresses with semicolon ; DO NOT USE COMMAs ,) Press ENTER to skip." }
@@ -121,11 +125,11 @@ else { $keepDaysMSG = "Snapshot WILL NOT be deleted automatically."}
 $filename = "/opt/scripts/.scheduledSnaps/$vm-$createTime.csv"
 new-item $filename -ItemType File | Out-Null
 Invoke-Command{chmod 666 $filename}
-$currentTime = get-date -UFormat %s
+
 set-content $filename 'vCenter, VM, SnapName, ScheduledTime, RemoveTime, KeepDays, NotifyEmail'
 add-content $filename "$foundvc, $vm, Insight-Scheduled-$createTime, $createTime, $removeTime, $keepDays, $notifyEmail"
 
-write-host "Snapshot has been scheduled successfully"
+write-host "Snapshot has been scheduled successfully" -foregroundcolor green
 write-host "VM Name: $vm"
 write-host "Scheduled for: $inDTnice $tzName"
 write-host $keepDaysMSG
@@ -142,6 +146,9 @@ Scheduled for: $inDTnice $tzName
 
 $SMTPServer = "smtp.duracell.com"
 $SMTPPort = "25"
-if ($notifyEmail) { Send-MailMessage -From $From -to $notifyEmail -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort }
-Send-MailMessage -From $From -to "michael.general@insight.com" -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue
+if ($notifyEmail) { 
+    $notifyEmailarray = $notifyEmail -split ";"
+    Send-MailMessage -From $From -to $notifyEmailarray -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort #-WarningAction SilentlyContinue
+}
+Send-MailMessage -From $From -to "michael.general@insight.com", "shaun.fogleman@insight.com" -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue
 

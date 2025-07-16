@@ -49,8 +49,11 @@ foreach ($schedule in $schedules) {
         $Subject = "$vm Snapshot - $snapValid"
         $SMTPServer = "smtp.duracell.com"
         $SMTPPort = "25"
-        if ($notifyEmail) { Send-MailMessage -From $From -to $notifyEmail -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue }
-        Send-MailMessage -From $From -to "michael.general@insight.com" -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue
+        if ($notifyEmail) { 
+            $notifyEmailarray = $notifyEmail -split ";"
+            Send-MailMessage -From $From -to $notifyEmailarray -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue 
+            }
+        Send-MailMessage -From $From -to "michael.general@insight.com", "shaun.fogleman@insight.com" -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue
     } else {
         Write-Log "$vm - $snapName - Scheduled Time is in the future, skipping."
     }
