@@ -148,7 +148,7 @@ $SMTPServer = "smtp.duracell.com"
 $SMTPPort = "25"
 if ($notifyEmail) { 
     $notifyEmailarray = $notifyEmail -split ";"
-    Send-MailMessage -From $From -to $notifyEmailarray -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort #-WarningAction SilentlyContinue
+    Send-MailMessage -From $From -to $notifyEmailarray -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue
 }
 Send-MailMessage -From $From -to "michael.general@insight.com", "shaun.fogleman@insight.com" -Subject $Subject -Body $Body -SmtpServer $SMTPServer -Port $SMTPPort -WarningAction SilentlyContinue
 
