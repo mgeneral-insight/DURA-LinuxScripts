@@ -15,6 +15,7 @@ foreach ($schedule in $schedules) {
         $vc = $snap.vCenter
         $notifyEmail = $snap.NotifyEmail
         $keepDays = $snap.KeepDays
+        $tktNum = $snap.Ticket
         [int]$removeTime = $snap.RemoveTime
         if ( $vc -eq 'heivcsa.corp.duracell.com' ) {
             $securePassword = Get-Content '/opt/scripts/.credfiles/hei.cred' | ConvertTo-SecureString
@@ -28,7 +29,7 @@ foreach ($schedule in $schedules) {
         $checksnap = get-vm $vm | get-snapshot -name $snapName
         if ($null -eq $checksnap) {
             $snapValid = "FAILED"
-            Write-Log "$vm - $snapName - FAILED to create snapshot"
+            Write-Log "$vm - FAILED to create snapshot"
             $body = "Failed to verify successful scheduled snapshot creation of $vm which was scheduled for this time period"
         } else {
             $snapValid = "Successful"
@@ -39,14 +40,14 @@ foreach ($schedule in $schedules) {
                 $removeFile = "/opt/scripts/.activeSnaps/$vm-$scheduledTime.csv"
                 new-item $removeFile -ItemType File | Out-Null
                 Invoke-Command{chmod 666 $removeFile}
-                set-content $removeFile 'vCenter, VM, SnapName, Taken, Remove'
-                add-content $removeFile "$vc, $vm, $snapName, $currentTime, $removeTime"
+                set-content $removeFile 'vCenter, VM, SnapName, Taken, Remove, Ticket'
+                add-content $removeFile "$vc, $vm, $snapName, $currentTime, $removeTime, $tktNum"
             }
         }
         remove-item $schedule
         #! Notify Email
         $From = "Insight-Automations@duracell.com"
-        $Subject = "$vm Snapshot - $snapValid"
+        $Subject = "$tktNum $vm Snapshot - $snapValid"
         $SMTPServer = "smtp.duracell.com"
         $SMTPPort = "25"
         if ($notifyEmail) { 

@@ -18,6 +18,7 @@ get-content -raw /opt/scripts/linux/logo.txt
 write-host "This script will schedule a snapshot of a VM for the time and date you input."
 write-host ""
 
+$tktNum = read-host -prompt "Enter ticket number for the request (press ENTER to skip)"
 $vm = read-host -Prompt "Enter name of VM to snapshot"
 write-host "Searching vCenters for $vm..."
 foreach ($vcenter in $vcenters) {
@@ -126,8 +127,8 @@ $filename = "/opt/scripts/.scheduledSnaps/$vm-$createTime.csv"
 new-item $filename -ItemType File | Out-Null
 Invoke-Command{chmod 666 $filename}
 
-set-content $filename 'vCenter, VM, SnapName, ScheduledTime, RemoveTime, KeepDays, NotifyEmail'
-add-content $filename "$foundvc, $vm, Insight-Scheduled-$createTime, $createTime, $removeTime, $keepDays, $notifyEmail"
+set-content $filename 'vCenter, VM, SnapName, ScheduledTime, RemoveTime, KeepDays, NotifyEmail, Ticket'
+add-content $filename "$foundvc, $vm, Insight-Scheduled-$createTime-$tktNum, $createTime, $removeTime, $keepDays, $notifyEmail, $tktNum"
 
 write-host "Snapshot has been scheduled successfully" -foregroundcolor green
 write-host "VM Name: $vm"
@@ -135,7 +136,7 @@ write-host "Scheduled for: $inDTnice $tzName"
 write-host $keepDaysMSG
 
 $From = "Insight-Automations@duracell.com"
-$Subject = "New Snapshot Scheduled - $vm"
+$Subject = "$tktNum New Snapshot Scheduled - $vm"
 $Body = @"
 A VMWare Snapshot has been scheduled:
 
