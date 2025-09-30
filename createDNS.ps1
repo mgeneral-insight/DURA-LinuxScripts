@@ -64,6 +64,7 @@ while ("y","n" -notcontains $createCNAME) { $createCNAME = Read-Host -Prompt "Do
 if ($createCNAME -eq "y") {
     while (!($servername)) { $servername = Read-Host -Prompt "Enter hostname for VM (NOT CNAME, No Domain, ie. LGGAWV001)" }
     while (!($cname)) { $cname = Read-Host -Prompt "Enter CNAME for $servername" }
+    $fqdn = $servername+".corp.duracell.com"
     $cfqdn = $cname+".corp.duracell.com"
     createCNAME
 }

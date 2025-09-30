@@ -36,7 +36,9 @@ foreach ($scan in $scans) {
         "Content-Type" = "application/json"
         "Accept" = "application/json"
     }
-    $body = '{"ServiceRequest": {"filters": {"Criteria": [{"field": "name", "operator": "EQUALS", "value": "' + $server +'"}]}}}'
+    #$body = '{"ServiceRequest": {"filters": {"Criteria": [{"field": "name", "operator": "EQUALS", "value": "' + $server +'"}]}}}'
+    $body = '{"ServiceRequest": {"filters": {"Criteria": [{"field": "dnsHostName", "operator": "EQUALS", "value": "' + $server +'.corp.duracell.com"}]}}}'
+
     $response = Invoke-RestMethod -Headers $Headers -Uri $Url -Method Post -Body $body -ContentType "application/json"
 
     if ($response.ServiceResponse.count -ne "1") {

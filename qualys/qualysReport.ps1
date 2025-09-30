@@ -36,10 +36,11 @@ $Headers = @{
     "Accept" = "application/json"
 }
 if (!($server)) { $server = read-host -Prompt "Enter Server Name" }
-$server = $server.ToUpper()
-$body = '{"ServiceRequest": {"filters": {"Criteria": [{"field": "name", "operator": "EQUALS", "value": "' + $server +'"}]}}}'
+$server = $server.ToLower()
+#$body = '{"ServiceRequest": {"filters": {"Criteria": [{"field": "name", "operator": "EQUALS", "value": "' + $server +'"}]}}}'
+$body = '{"ServiceRequest": {"filters": {"Criteria": [{"field": "dnsHostName", "operator": "EQUALS", "value": "' + $server +'.corp.duracell.com"}]}}}'
 
-
+$body
 write-host "Searching Qualys for $server..."
 # Search for Server
 $response = Invoke-RestMethod -Headers $Headers -Uri $Url -Method Post -Body $body -ContentType "application/json"
