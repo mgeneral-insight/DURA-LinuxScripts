@@ -9,7 +9,7 @@ foreach ($cluster in $clusters) {
     $i++
 }
 $j = $i - 1
-$clusterNum = read-host "Enter number (0-$j) for number of cluster."
+$clusterNum = read-host "Enter number (0-$j) for number of cluster"
 
 write-host "Processing cluster" $clusters[$clusterNum]
 if ($clusterNum -eq "0") {
@@ -82,9 +82,9 @@ foreach ($vmhost in $hosts) {
     $esxcliArgs.vibname = "tools-light"
     $action = $esxcli.software.vib.remove.invoke($esxcliArgs)
     if ($action.Message -eq "Operation finished successfully.") { 
-            Write-Host "VIB removed successfully!" -ForegroundColor Green 
+            Write-Host "-- VIB removed successfully!" -ForegroundColor Green 
     } else {
-            write-host "ERROR: VIB Removal Failed" -ForegroundColor Red
+            write-host "-- ERROR: VIB Removal Failed" -ForegroundColor Red
     }
 }
 Disconnect-VIServer -Confirm:$false

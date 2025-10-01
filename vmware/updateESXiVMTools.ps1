@@ -28,7 +28,7 @@ foreach ($cluster in $clusters) {
     $i++
 }
 $j = $i - 1
-$clusterNum = read-host "Enter number (0-$j) for number of cluster."
+$clusterNum = read-host "Enter number (0-$j) for number of cluster"
 write-host "Processing cluster" $clusters[$clusterNum]
 if ($clusterNum -eq "0") {
     # Bethel
@@ -135,7 +135,7 @@ $vibPath = "/vmfs/volumes/$datastore/ISOs/vmtools_vibs/$sourceFileName"
 
 #$vmhosts | ft
 foreach ($vmhost in $vmhosts) {
-    write-host "-- Starting Host : $vmhost"
+    write-host "Starting Host : $vmhost"
     $esxcli = get-esxcli -vmhost $vmhost -V2
     $esxcliCVargs = $esxcli.software.component.get.createargs()
     $esxcliCVargs.component = "VMware-VM-Tools"
