@@ -12,11 +12,12 @@ Select a task to perform:
 6) Get Vulnerability Report from Qualys
 7) Install VMware Tools VIB on ESXi Servers
 8) Remove VMware Tools VIB from ESXi Servers
+9) Change ThreatLocker Blocking Mode
 
 "@
 
-Do { $selection = Read-Host "Choose an option (1-8)"}
-Until (1..8 -contains $selection)
+Do { $selection = Read-Host "Choose an option (1-9)"}
+Until (1..9 -contains $selection)
 
 if ($selection -eq "1") { pwsh /opt/scripts/linux/vmware/createSnapshot.ps1 } 
 elseif ($selection -eq "2") { pwsh /opt/scripts/linux/vmware/scheduleSnapshot.ps1 } 
@@ -26,3 +27,4 @@ elseif ($selection -eq "5") { pwsh /opt/scripts/linux/vmware/createVM.ps1 }
 elseif ($selection -eq "6") { pwsh /opt/scripts/linux/qualys/qualysReport.ps1 }
 elseif ($selection -eq "7") { pwsh /opt/scripts/linux/vmware/updateESXiVMTools.ps1 }
 elseif ($selection -eq "8") { pwsh /opt/scripts/linux/vmware/removeESXiVMTools.ps1 }
+elseif ($selection -eq "9") { pwsh /opt/scripts/linux/changeThreatLockerMode.ps1 }
